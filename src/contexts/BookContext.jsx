@@ -12,18 +12,24 @@ const BookReducer = (state, action) => {
                 id: uuid()
             }]
         case 'remove':
-            return [state.filter(book => book.id !== action.id)]
+            return state.filter(book => book.id !== action.id)
         default:
             return state
     }
-
 }
 
 const BookContextProvider = (props) => {
     const [books, dispatch] = React.useReducer(
         BookReducer,
-        []
-    )
+        [],
+        () => {
+            const localData = localStorage.getItem('books');
+            return localData ? JSON.parse(localData) : []
+        })
+
+    React.useEffect(() => {
+        localStorage.setItem('books', JSON.stringify(books))
+    }, [books])
 
     return (
         <BookContext.Provider value={{ books, dispatch }}>
